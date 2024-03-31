@@ -11,10 +11,7 @@
 
   in {
 
-    programs._1password = { enable = true; };
-    programs._1password-gui = { enable = true; };
-    polkitPolicyOwners = [ "mtuckerb" ];
-
+   
     nixosConfigurations = {
       tuckernix = lib.nixosSystem {
         system = "aarch64-linux";
