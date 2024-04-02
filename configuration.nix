@@ -14,26 +14,6 @@
   networking.hostName = "tuckernix"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
-  fonts.packages = with pkgs; [
-    noto-fonts
-    noto-fonts-cjk
-    noto-fonts-emoji
-    liberation_ttf
-    fira-code
-    fira-code-symbols
-    mplus-outline-fonts.githubRelease
-    dina-font
-    nerdfonts
-    proggyfonts
-  ];
-    programs._1password = { enable = true; };
-    programs._1password-gui = { enable = true; };
-   # polkitPolicyOwners = [ "mtuckerb" ];
-  
-  programs.nix-ld.enable = true;
-  programs.nix-ld.libraries = with pkgs; [
-# add any missing dynamic libs for unpackaged bins here
-  ];
 
   time.timeZone = "America/New_York";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -152,9 +132,27 @@
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [22];
   # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
 
+  fonts.packages = with pkgs; [
+    noto-fonts
+    noto-fonts-cjk
+    noto-fonts-emoji
+    liberation_ttf
+    fira-code
+    fira-code-symbols
+    mplus-outline-fonts.githubRelease
+    dina-font
+    nerdfonts
+    proggyfonts
+  ];
+    programs._1password = { enable = true; };
+    programs._1password-gui = { enable = true; };
+   # polkitPolicyOwners = [ "mtuckerb" ];
+  
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+# add any missing dynamic libs for unpackaged bins here
+  ];
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
