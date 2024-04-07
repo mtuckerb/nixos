@@ -14,7 +14,6 @@
   networking.hostName = "tuckernix"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
-
   time.timeZone = "America/New_York";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
@@ -33,6 +32,10 @@
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
 
+  services.redis.servers."tbredis" = { 
+    enable = true;
+    port = 6379;
+  };
   services.xserver = {
     layout = "us";
     xkbVariant = "";
@@ -52,11 +55,23 @@
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
+  services.xserver.libinput.enable = true;
+  services.postgresql = {
+	enable = true;
+	ensureDatabases = ["chicken_tinder" ];
+	authentication = pkgs.lib.mkOverride 10 ''
+	  local all all              trust
+	  host  all all 127.0.0.1/32 trust
+	  host  all all ::1/128      trust
+	  host 	all all 172.16.199.1/32 trust
+	'';
+	enableTCPIP = true;
+  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.mtuckerb = {
     isNormalUser = true;
+    shell = pkgs.zsh;
     description = "Tucker Bradford";
     extraGroups = ["networkmanager" "wheel"];
     packages = with pkgs; [
@@ -114,6 +129,8 @@
     stdenv.cc.libc_dev
     autogen
     isl
+    home-manager
+    cifs-utils
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -126,12 +143,24 @@
 
   # List services that you want to enable:
 
+
+  # For mount.cifs, required unless domain name resolution is not needed.
+  fileSystems."/home/mtuckerb/Mac" = {
+    device = "//172.16.199.1/mtuckerb";
+    fsType = "cifs";
+    options = let
+      # this line prevents hanging on network split
+       automount_opts = "user,users";
+
+      in ["${automount_opts},credentials=/etc/nixos/smb-secrets,uid=1000,gid=100"];
+  };
+
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [22];
-  # networking.firewall.allowedUDPPorts = [ ... ];
+  networking.firewall.allowedTCPPorts = [22 5432];
+   networking.firewall.allowedUDPPorts = [ 5432 ];
 
   fonts.packages = with pkgs; [
     noto-fonts
@@ -147,8 +176,9 @@
   ];
     programs._1password = { enable = true; };
     programs._1password-gui = { enable = true; };
-   # polkitPolicyOwners = [ "mtuckerb" ];
-  
+#    polkitPolicyOwners = [ "mtuckerb" ];
+#    virtualisation.vmware.guest.enable = true;
+  programs.zsh.enable = true; 
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
 # add any missing dynamic libs for unpackaged bins here
